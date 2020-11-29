@@ -61,6 +61,7 @@ MVP模式 典例 —— 登录案例
 下面以代码的形式一一展开。
 
 ①实体类bean
+```
 public class User {
     private String password;
     private String username;
@@ -89,17 +90,19 @@ public class User {
                 '}';
     }
 }
+```
 封装了用户名、密码，方便数据传递。
 
 ②接口
-
+```
 public interface LoginModel {
     void login(User user, OnLoginFinishedListener listener);
 }
+```
 其中OnLoginFinishedListener 是presenter层的接口，方便实现回调presenter，通知presenter业务逻辑的返回结果，具体在presenter层介绍。
 
 ③接口实现类
-
+```
 public class LoginModelImpl implements LoginModel {
     @Override
     public void login(User user, final OnLoginFinishedListener listener) {
@@ -123,6 +126,7 @@ public class LoginModelImpl implements LoginModel {
         }, 2000);
     }
 }
+```
 实现Model层逻辑：延时模拟登陆（2s），如果用户名或者密码为空则登陆失败，否则登陆成功。
 
 2.View层
@@ -138,7 +142,7 @@ public class LoginModelImpl implements LoginModel {
 下面以代码的形式一一展开。
 
 ①接口
-
+```
 public interface LoginView {
     //login是个耗时操作，我们需要给用户一个友好的提示，一般就是操作ProgressBar
     void showProgress();
@@ -151,12 +155,14 @@ public interface LoginView {
    //login成功，也给个提示
     void showSuccess();
 }
+```
+
 上述5个方法都是presenter根据model层返回结果需要view执行的对应的操作。
 
 ②接口实现类
 
 即对应的登录的Activity，需要实现LoginView接口。
-
+```
 public class LoginActivity extends AppCompatActivity implements LoginView, View.OnClickListener {
     private ProgressBar progressBar;
     private EditText username;
@@ -215,6 +221,8 @@ public class LoginActivity extends AppCompatActivity implements LoginView, View.
     }
 
 }
+```
+
 View层实现Presenter层需要调用的控件操作，方便Presenter层根据Model层返回的结果进行操作View层进行对应的显示。
 
 3.Presenter层
@@ -228,7 +236,7 @@ Presenter是用作Model和View之间交互的桥梁。 从上图的包结构图�
 下面以代码的形式一一展开。
 
 ①接口
-
+```
 public interface OnLoginFinishedListener {
     void onUsernameError();
 
@@ -236,17 +244,19 @@ public interface OnLoginFinishedListener {
 
     void onSuccess();
 }
+```
 当Model层得到请求的结果，需要回调Presenter层，让Presenter层调用View层的接口方法。
-
+```
 public interface LoginPresenter {
     void validateCredentials(User user);
 
     void onDestroy();
 }
+```
 登陆的Presenter 的接口，实现类为LoginPresenterImpl，完成登陆的验证，以及销毁当前view。
 
 ②接口实现类
-
+```
 public class LoginPresenterImpl implements LoginPresenter, OnLoginFinishedListener {
     private LoginView loginView;
     private LoginModel loginModel;
@@ -293,6 +303,7 @@ public class LoginPresenterImpl implements LoginPresenter, OnLoginFinishedListen
         }
     }
 }
+```
 由于presenter完成二者的交互，那么肯定需要二者的实现类（通过传入参数，或者new）。
 
 presenter里面有个OnLoginFinishedListener， 其在Presenter层实现，给Model层回调，更改View层的状态， 确保 Model层不直接操作View层。
